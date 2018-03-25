@@ -2,21 +2,44 @@ import * as fs from 'fs';
 import * as readline from 'readline';
 import { JMDictBuilder } from "./jmdict-builder";
 
-export abstract class JMDictParser {
-    private static _dictionary: any; 
-
+export abstract class JMDictParser { 
     private static _regexLibrary: {[key: string]: RegExp} = {
         'entity': /^\s*<!ENTITY\s+([^\s]+)\s+"([^"]+)"\s*>\s*$/,
         'single-tag': /^\s*<(\/)?\s*([A-Za-z0-9:_]+)\s*((?:[A-Za-z0-9:_]+="[^"]+"\s*)*)\s*(\/)?>\s*$/,
         'tag-with-content': /^\s*<\s*([A-Za-z0-9:_]+)\s*((?:[A-Za-z0-9:_]+="[^"]+"\s*)*)\s*>\s*(.+)\s*<\/\s*\1\s*>\s*$/,
     }
     
-    public static parse(filename: string, func: (d: any) => void): any {
+    public static parseJSON(filename: string, func: (d: any) => void) {
+        if (fs.existsSync(filename)) {
+            const stream = fs.createReadStream(filename);
+            const reader = readline.createInterface(stream);
+            
+            let dictionary: { entry: any[] } = { entry: [] };
 
-        if (this._dictionary != null) {
-            func(this._dictionary);
+            reader.on('line', l => { 
+                if (l.startsWith(' ')) {
+                    let entry = <string>l;
+                    entry = entry.trim();
+                    entry = entry.substring(0, entry.length - 1);
+                    
+                    dictionary.entry.push(JSON.parse(entry));
+                }
+            });
+            
+            reader.on('close', () => { 
+                if (dictionary.entry.length > 0) {
+                    func(dictionary);
+                }
+            });
+
             return;
         }
+
+        func(null);
+        return;
+    }
+
+    public static parseXML(filename: string, func: (d: any) => void) {
 
         if (fs.existsSync(filename)) {
     
@@ -24,6 +47,7 @@ export abstract class JMDictParser {
             const reader = readline.createInterface(stream);
             
             const builder = new JMDictBuilder();
+            let dictionary: any;
 
             let lineNo = 0;
             reader.on('line', l => { 
@@ -50,17 +74,17 @@ export abstract class JMDictParser {
             });
             
             reader.on('close', () => { 
-                this._dictionary = builder.get();
+                dictionary = builder.get();
 
-                if (this._dictionary != null) {
-                    func(this._dictionary);
+                if (dictionary != null) {
+                    func(dictionary);
                 }
             });
 
             return;
         }
 
-        func(this._dictionary);
+        func(null);
         return;
     }
     
