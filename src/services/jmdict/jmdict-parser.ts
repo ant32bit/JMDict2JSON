@@ -1,10 +1,10 @@
 import * as fs from 'fs';
 import * as readline from 'readline';
 import { JMDictBuilder } from "./jmdict-builder";
+import { JMDictValidator } from './jmdict-validator';
 
 export abstract class JMDictParser { 
     private static _regexLibrary: {[key: string]: RegExp} = {
-        'entity': /^\s*<!ENTITY\s+([^\s]+)\s+"([^"]+)"\s*>\s*$/,
         'single-tag': /^\s*<(\/)?\s*([A-Za-z0-9:_]+)\s*((?:[A-Za-z0-9:_]+="[^"]+"\s*)*)\s*(\/)?>\s*$/,
         'tag-with-content': /^\s*<\s*([A-Za-z0-9:_]+)\s*((?:[A-Za-z0-9:_]+="[^"]+"\s*)*)\s*>\s*(.+)\s*<\/\s*\1\s*>\s*$/,
     }
@@ -46,20 +46,23 @@ export abstract class JMDictParser {
             const stream = fs.createReadStream(filename);
             const reader = readline.createInterface(stream);
             
-            const builder = new JMDictBuilder();
+            const validator = new JMDictValidator();
+            let builder: JMDictBuilder = undefined;
             let dictionary: any;
 
             let lineNo = 0;
             reader.on('line', l => { 
+
                 lineNo++;
 
-                try {
-                    let entity = this.getEntity(l);
-                    if (entity) {
-                        builder.nextEntity(entity.key, entity.value);
-                        return;
+                if (builder === undefined) {
+                    if (validator.parseXML(l)) {
+                        const def = validator.getDefinition();
+                        builder = new JMDictBuilder(def);
                     }
+                }
 
+                try {
                     let tag = this.getTag(lineNo, l);
 
                     if (tag) {

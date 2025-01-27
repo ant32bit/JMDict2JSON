@@ -5,9 +5,9 @@
 After running `npm install` in root, run `npm run start`. If using VS Code, F5 will also run the app in debug mode.
 
 ##### Input
-JMdict is an open-source Japanese dictionary provided by Monash University and updated and maintained by the Electronic Dictionary Research and Development Group.
+JMdict is an open-source Japanese dictionary provided by the Electronic Dictionary Research and Development Group.
 
-JMdict.xml is not included in this repo (it's 100Mb+!!!). You can download it from Monash University: http://ftp.monash.edu/pub/nihongo/00INDEX.html#dic_fil
+JMdict.xml is not included in this repo (it's 100Mb+!!!). You can download it from the EDRDG homepage: http://ftp.edrdg.org/pub/Nihongo/00INDEX.html#dic_fil
 
 Once downloaded, place the file in a `./content` directory in the root and run as per the usage above.
 
@@ -21,9 +21,9 @@ The entire file is valid JSON array of entries, but due to its size, it will not
 ##### About the project
 - The project is provided under GNU General Public License. This is to ensure anyone can use it, but this repository benefits from any updates anyone does to the project. If you have an improvement, please make a pull request.
 
-- The project was built to serve my purpose, which was a JSON equivalent of JMDict. It is a quick fix, so there is definitely room for improvements. Things I want to (eventually) fix: 
+- The structure of the JSON comes from the JMdict dtd. It's kind of thrown together but it works for JMdict, JMdict_e, JMnedict and kanjidic2
 
-  - The structure of the JSON comes from a manually created version of the JMdict dtd. This can and should be recreated from the actual dtd to ensure that the project continues to work with future versions of JMdict.
+- The project was built to serve my purpose, which was a JSON equivalent of JMDict. It is a quick fix, so there is definitely room for improvements. Things I want to (eventually) fix: 
 
   - The project reads the xml line by line and expects the a single tag on each line as the JMdict.xml file is provided. I don't expect it to change, but the app should be able to handle xml elements over multiple lines or multiple elements of a single line.
 

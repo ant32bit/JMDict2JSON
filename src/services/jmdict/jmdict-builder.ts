@@ -1,69 +1,111 @@
 import { TagDetails } from "./jmdict-parser";
 
-export class JMDictBuilder {
+const structure_JMdict_e: BuilderStructure_RootDefinition = {
+    root: "JMdict",
+    elements: {
+        "JMdict": {
+            "entry": { allowMany: true }
+        },
+        "entry": {
+            "ent_seq": { required: true },
+            "k_ele": { allowMany: true },
+            "r_ele": { required: true, allowMany: true },
+            "sense": { required: true, allowMany: true }
+        },
+        "k_ele": {
+            "keb": { required: true },
+            "ke_inf": { allowMany: true },
+            "ke_pri": { allowMany: true },
+        },
+        "r_ele": {
+            "reb": { required: true },
+            "re_nokanji": { allowMany: false },
+            "re_restr": { allowMany: true },
+            "re_inf": { allowMany: true },
+            "re_pri": { allowMany: true },
+        },
+        "sense": {
+            "stagk": { allowMany: true },
+            "stagr": { allowMany: true },
+            "pos": { allowMany: true },
+            "xref": { allowMany: true },
+            "ant": { allowMany: true },
+            "field": { allowMany: true },
+            "misc": { allowMany: true },
+            "s_inf": { allowMany: true },
+            "lsource": { allowMany: true },
+            "dial": { allowMany: true },
+            "gloss": { allowMany: true }
+        },
+        "lsource": {
+            "xml:lang": { attribute: true, default: 'eng' },
+            "ls_type": { attribute: true, default: 'full' },
+            "ls_wasei": { attribute: true },
+        },
+        "gloss": {
+            "xml:lang": { attribute: true, default: 'eng' },
+            "g_gend": { attribute: true },
+            "g_type": { attribute: true },
+            "pri": { allowMany: true }
+        }
+    },
+    entities: {}
+};
 
-    private entities: {[key: string]: string} = {};
+const structure_JMnedict: BuilderStructure_RootDefinition = {
+    root: "JMnedict",
+    elements: {
+        "JMnedict": {
+            "entry": { allowMany: true }
+        },
+        "entry": {
+            "ent_seq": { required: true },
+            "k_ele": { allowMany: true },
+            "r_ele": { required: true, allowMany: true },
+            "trans": { required: true, allowMany: true }
+        },
+        "k_ele": {
+            "keb": { required: true },
+            "ke_inf": { allowMany: true },
+            "ke_pri": { allowMany: true },
+        },
+        "r_ele": {
+            "reb": { required: true },
+            "re_nokanji": { allowMany: false },
+            "re_restr": { allowMany: true },
+            "re_inf": { allowMany: true },
+            "re_pri": { allowMany: true },
+        },
+        "lsource": {
+            "xml:lang": { attribute: true, default: 'eng' },
+            "ls_type": { attribute: true, default: 'full' },
+            "ls_wasei": { attribute: true },
+        },
+        "gloss": {
+            "xml:lang": { attribute: true, default: 'eng' },
+            "g_gend": { attribute: true },
+            "g_type": { attribute: true },
+            "pri": { allowMany: true }
+        },
+        "trans": {
+            "trans_det": { allowMany: true },
+            "name_type": { allowMany: true }
+        }
+    },
+    entities: {}
+}
+
+
+export class JMDictBuilder {
     private stack: BuilderReadStackContainer[] = [];
     private final: any = null;
 
     private contentTag = 'xml:content';
-    private structure: BuilderStructure_RootDefinition = {
-        root: "JMdict",
-        elements: {
-            "JMdict": {
-                "entry": { allowMany: true }
-            },
-            "entry": {
-                "ent_seq": { required: true },
-                "k_ele": { allowMany: true },
-                "r_ele": { required: true, allowMany: true },
-                "sense": { required: true, allowMany: true },
-            },
-            "k_ele": {
-                "keb": { required: true },
-                "ke_inf": { allowMany: true },
-                "ke_pri": { allowMany: true },
-            },
-            "r_ele": {
-                "reb": { required: true },
-                "re_nokanji": { allowMany: false },
-                "re_restr": { allowMany: true },
-                "re_inf": { allowMany: true },
-                "re_pri": { allowMany: true },
-            },
-            "sense": {
-                "stagk": { allowMany: true },
-                "stagr": { allowMany: true },
-                "pos": { allowMany: true },
-                "xref": { allowMany: true },
-                "ant": { allowMany: true },
-                "field": { allowMany: true },
-                "misc": { allowMany: true },
-                "s_inf": { allowMany: true },
-                "lsource": { allowMany: true },
-                "dial": { allowMany: true },
-                "gloss": { allowMany: true }
-            },
-            "lsource": {
-                "xml:lang": { attribute: true, default: 'eng' },
-                "ls_type": { attribute: true, default: 'full' },
-                "ls_wasei": { attribute: true },
-            },
-            "gloss": {
-                "xml:lang": { attribute: true, default: 'eng' },
-                "g_gend": { attribute: true },
-                "g_type": { attribute: true },
-                "pri": { allowMany: true }
-            }
-        }
-    };
+    
+    constructor(private structure: BuilderStructure_RootDefinition) {}
 
     public get(): any {
         return this.final;
-    }
-
-    public nextEntity(key: string, value: string) {
-        this.entities[key] = value;
     }
 
     public nextTag(tag: TagDetails) {
@@ -178,7 +220,7 @@ class BuilderReadStackContainer {
     }
 }
 
-class BuilderStructure_RootDefinition {
+type BuilderStructure_RootDefinition = {
     root: string;
     elements: {
         [element: string]: { // element tags
@@ -190,4 +232,5 @@ class BuilderStructure_RootDefinition {
             }
         }
     };
+    entities: {[name: string]: string};
 }

@@ -10,7 +10,8 @@
   "author": "Anthony Paes",
   "license": "ISC",
   "dependencies": {
-    "@types/node": "^9.4.7",
-    "node": "^9.8.0"
+    "@types/node": "^22.10.10",
+    "node": "^20.15.0",
+    "typescript": "^5.7.3"
   }
 }
